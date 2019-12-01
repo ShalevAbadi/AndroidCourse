@@ -4,7 +4,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class MoveController implements View.OnTouchListener {
+public class MoveController implements IMoveController, View.OnTouchListener {
 
     private int numOfLanes;
     private int lane;
