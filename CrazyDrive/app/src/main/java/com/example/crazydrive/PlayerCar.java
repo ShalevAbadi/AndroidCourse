@@ -16,23 +16,23 @@ public class PlayerCar implements ISafeZone{
     }
 
     public int getSpeed(){
-        return this.speedController.getSpeed();
+        return speedController.getSpeed();
     }
 
     public int getLane(){
-        return this.moveController.getLane();
+        return moveController.getLane();
     }
 
     public int getHeight(){
-        return this.height;
+        return height;
     }
 
     public int getWidth(){
-        return this.width;
+        return width;
     }
 
     @Override
     public int getSafeZone() {
-        return this.height;
+        return (int)(height*1.3);
     }
 }

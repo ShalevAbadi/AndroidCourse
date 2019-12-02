@@ -12,17 +12,27 @@ public class Road {
         for (int i = 0; i < roadItemsQueues.length; i++) {
             roadItemsQueues[i] = new ArrayList();
         }
-        addRoadItems();
     }
 
-    public void addRoadItems(){
-        ConfigManager conf = ConfigManager.getInstance();
-        Random r = new Random();
-        int i = r.nextInt((conf.getLanesCount()));
-            if (roadItemsQueues[i].isEmpty() || roadItemsQueues[i].get(roadItemsQueues[i].size() - 1).getYPos() > roadItemsQueues[i].get(roadItemsQueues[i].size() - 1).getHeight()) {
-                roadItemsQueues[i].add(new PoliceCar(0, conf.getLaneWidth() / 2, conf.getLaneWidth()));
-            }
+    public void addRoadItems(ISafeZone safeZone){
+        double chance = 0.7;
+        if(isAddPossible(safeZone)) {
+            ConfigManager conf = ConfigManager.getInstance();
+            Random r = new Random();
+            int i = r.nextInt((conf.getLanesCount()));
+                if (Math.random() < chance) {
+                    roadItemsQueues[i].add(new PoliceCar(0, conf.getLaneWidth() / 2, conf.getLaneWidth()));
+                }
+        }
+    }
 
+    public boolean isAddPossible(ISafeZone safeZone){
+        for(int i = 0; i < roadItemsQueues.length; i++){
+            if (!roadItemsQueues[i].isEmpty() && roadItemsQueues[i].get(roadItemsQueues[i].size() - 1).getYPos() < safeZone.getSafeZone() + roadItemsQueues[i].get(roadItemsQueues[i].size() - 1).getHeight()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void moveAllRoadItems(int distance){
@@ -34,7 +44,7 @@ public class Road {
         }
         for (int i = 0; i < roadItemsQueues.length; i++) {
             if(!roadItemsQueues[i].isEmpty()) {
-                if (roadItemsQueues[i].get(0).getYPos() > ConfigManager.getInstance().getRoadLength() - 70 - 200) {
+                if (roadItemsQueues[i].get(0).getYPos() > ConfigManager.getInstance().getRoadLength()) {
                     roadItemsQueues[i].remove(0);
                 }
             }
@@ -46,6 +56,14 @@ public class Road {
     }
 
     public RoadItem getFirstRoadItemAt(int lane){
+        if(roadItemsQueues[lane].isEmpty()){
+            return null;
+        }
         return roadItemsQueues[lane].get(0);
+    }
+
+    public void removeFirstRoadItemAt(int lane){
+        if(!roadItemsQueues[lane].isEmpty()){
+            roadItemsQueues[lane].remove(0);        }
     }
 }

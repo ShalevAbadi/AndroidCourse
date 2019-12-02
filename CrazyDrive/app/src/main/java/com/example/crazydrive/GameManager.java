@@ -5,13 +5,13 @@ import android.util.Log;
 public class GameManager {
 
     private static GameManager instance;
-    private int score = 0;
     private ConfigManager conf = ConfigManager.getInstance();
     private int lives = conf.getInitialLifesCount();
     private PlayerCar playerCar;
     private Road road;
+    private SpeedController speedController = new SpeedController(10);
     private GameManager(){
-        this.playerCar = new PlayerCar(conf.getMoveController(), new SpeedController(30), conf.getLaneWidth(), conf.getLaneWidth()/2);
+        this.playerCar = new PlayerCar(conf.getMoveController(), speedController, conf.getLaneWidth(), conf.getLaneWidth()/2);
         this.road = new Road(conf.getLanesCount());
     }
 
@@ -24,18 +24,20 @@ public class GameManager {
 
     public void doStep(){
         road.moveAllRoadItems(playerCar.getSpeed());
-        road.addRoadItems();
-        if (road.getFirstRoadItemAt(playerCar.getLane()) != null){
-            Log.i("Car Pos at: ","lane: " + playerCar.getLane() + "yPos" + road.getFirstRoadItemAt(playerCar.getLane()).getYPos());
+        road.addRoadItems(playerCar);
+        if(isCollision()){
+            handleCollision();
         }
     }
 
-    public int start(){
-        return this.score;
+    private void handleCollision(){
+        road.removeFirstRoadItemAt(playerCar.getLane());
+        lives -=1;
     }
 
-    public int getPlayerCarLane(){
-        return this.playerCar.getLane();
+    private boolean isCollision(){
+        RoadItem tempRoadItem = road.getFirstRoadItemAt(playerCar.getLane());
+        return (tempRoadItem != null && (tempRoadItem.getYPos()+ tempRoadItem.getHeight() >= (conf.getRoadLength() - playerCar.getHeight())));
     }
 
     public Road getRoad(){
@@ -46,5 +48,8 @@ public class GameManager {
         return playerCar;
     }
 
+    public int getLives(){
+        return lives;
+    }
 
 }

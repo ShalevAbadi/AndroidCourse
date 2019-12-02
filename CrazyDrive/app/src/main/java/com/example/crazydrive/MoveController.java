@@ -38,10 +38,9 @@ public class MoveController implements IMoveController, View.OnTouchListener {
 
         if(event.getX() < x/2){
             moveLeft();
-        } else if (event.getX() > x/2) {
+        } else if (event.getX() >= x/2) {
             moveRight();
         }
-            Log.i("tag", "X is " +event.getX()+ " lane is " + this.getLane());
             return true;
         }
         return true;
