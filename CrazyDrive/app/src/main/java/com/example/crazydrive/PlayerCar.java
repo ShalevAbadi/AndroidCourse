@@ -33,6 +33,6 @@ public class PlayerCar implements ISafeZone{
 
     @Override
     public int getSafeZone() {
-        return (int)(height*1.3);
+        return (int)(height*1.5);
     }
 }

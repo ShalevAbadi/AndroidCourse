@@ -1,15 +1,15 @@
 package com.example.crazydrive;
 
-import android.util.Log;
-
 public class GameManager {
 
     private static GameManager instance;
     private ConfigManager conf = ConfigManager.getInstance();
-    private int lives = conf.getInitialLifesCount();
+    private int lives = conf.getInitialLivesCount();
     private PlayerCar playerCar;
     private Road road;
-    private SpeedController speedController = new SpeedController(10);
+    private double score = 0;
+    private SpeedController speedController = conf.getSpeedController();
+
     private GameManager(){
         this.playerCar = new PlayerCar(conf.getMoveController(), speedController, conf.getLaneWidth(), conf.getLaneWidth()/2);
         this.road = new Road(conf.getLanesCount());
@@ -22,7 +22,12 @@ public class GameManager {
         return GameManager.instance;
     }
 
+    public static void resetGame(){
+        instance = new GameManager();
+    }
+
     public void doStep(){
+        score += 0.01;
         road.moveAllRoadItems(playerCar.getSpeed());
         road.addRoadItems(playerCar);
         if(isCollision()){
@@ -50,6 +55,10 @@ public class GameManager {
 
     public int getLives(){
         return lives;
+    }
+
+    public int getScore(){
+        return (int)score;
     }
 
 }

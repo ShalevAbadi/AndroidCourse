@@ -7,6 +7,7 @@ public class ConfigManager {
     private int laneWidth;
     private int roadLength;
     private IMoveController moveController;
+    private SpeedController speedController;
     private ConfigManager(){
     }
 
@@ -35,6 +36,10 @@ public class ConfigManager {
         this.moveController = moveController;
     }
 
+    public void setSpeedController(SpeedController speedController1){
+        this.speedController = speedController1;
+    }
+
     public IMoveController getMoveController(){
         return moveController;
     }
@@ -44,14 +49,18 @@ public class ConfigManager {
     }
 
     public int getLanesCount(){
-        return this.lanesCount;
+        return lanesCount;
     }
+
     public int getLaneWidth(){
-        return this.laneWidth;
+        return laneWidth;
     }
 
+    public int getInitialLivesCount(){
+        return initialLifeCount;
+    }
 
-    public int getInitialLifesCount(){
-        return this.initialLifeCount;
+    public SpeedController getSpeedController(){
+        return speedController;
     }
 }

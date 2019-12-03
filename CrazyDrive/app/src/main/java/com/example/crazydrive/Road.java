@@ -44,7 +44,7 @@ public class Road {
         }
         for (int i = 0; i < roadItemsQueues.length; i++) {
             if(!roadItemsQueues[i].isEmpty()) {
-                if (roadItemsQueues[i].get(0).getYPos() > ConfigManager.getInstance().getRoadLength()) {
+                if (roadItemsQueues[i].get(0).getYPos() > ConfigManager.getInstance().getRoadLength()){
                     roadItemsQueues[i].remove(0);
                 }
             }

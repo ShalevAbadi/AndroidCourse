@@ -1,27 +1,17 @@
 package com.example.crazydrive;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.arch.core.util.Function;
 
-import android.app.usage.UsageEvents;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.icu.text.RelativeDateTimeFormatter;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Display;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -31,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final RelativeLayout rl = new RelativeLayout(getApplicationContext());
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.MATCH_PARENT
         );
@@ -59,13 +49,18 @@ public class MainActivity extends AppCompatActivity {
 
         ConfigManager conf = ConfigManager.getInstance();
         int lanesCount = 3;
+        int initialLives = 3;
+        int initialSpeed = 5;
         conf.setLanesCount(lanesCount);
         conf.setLaneWidth(getLaneWidth(lanesCount));
         conf.setRoadLength(getRoadLength());
+        conf.setInitialLife(initialLives);
+        conf.setSpeedController(new SpeedController(initialSpeed));
         MoveController mc = new MoveController(conf.getLanesCount(), conf.getLanesCount()/2);
         conf.setMoveController(mc);
-
         rl.setOnTouchListener(mc);
+        conf.setSpeedController(new SpeedController(10));
+        GameManager.resetGame();
         final Handler handler = new Handler();
 
         final Runnable runnable = new Runnable() {
@@ -76,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
                 GameManager gm = GameManager.getInstance();
                 gm.doStep();
                 renderLifeBar(rl, gm.getLives());
+                if(gm.getScore() > ConfigManager.getInstance().getSpeedController().getSpeed()) {
+                    ConfigManager.getInstance().getSpeedController().setSpeed(gm.getScore());
+                }
                 if(gm.getLives() > 0){
                     handler.postDelayed(this, 10);
                 } else{
@@ -99,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     public int getRoadLength(){
         Display display = getWindowManager().getDefaultDisplay();// find screen size X , Y
         Point size = new Point();
-        display.getSize(size);
+        display.getRealSize(size);
         return size.y;
     }
 
@@ -126,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         imageView_playerCar.setLayoutParams(lp);
         lp.width = laneWidth;
         imageView_playerCar.setX((laneWidth) * playerCar.getLane());
-        imageView_playerCar.setY(roadLength - playerCar.getHeight() + 70);
+        imageView_playerCar.setY(roadLength - playerCar.getHeight());
         rl.addView(imageView_playerCar);
     }
 

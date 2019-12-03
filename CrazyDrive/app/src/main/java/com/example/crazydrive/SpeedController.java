@@ -2,7 +2,7 @@ package com.example.crazydrive;
 
 public class SpeedController implements ISpeedController {
 
-    int speed = 0;
+    int speed;
 
     public SpeedController(int speed){
         this.speed = speed;
