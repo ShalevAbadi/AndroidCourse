@@ -57,8 +57,8 @@ public class GameManager {
         return lives;
     }
 
-    public int getScore(){
-        return (int)score;
+    public double getScore(){
+        return score;
     }
 
 }

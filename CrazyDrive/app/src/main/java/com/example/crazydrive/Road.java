@@ -21,7 +21,7 @@ public class Road {
             Random r = new Random();
             int i = r.nextInt((conf.getLanesCount()));
                 if (Math.random() < chance) {
-                    roadItemsQueues[i].add(new PoliceCar(0, conf.getLaneWidth() / 2, conf.getLaneWidth()));
+                    roadItemsQueues[i].add(new PoliceCar(-conf.getLaneWidth(), conf.getLaneWidth() / 2, conf.getLaneWidth()));
                 }
         }
     }
