@@ -1,6 +1,7 @@
 package com.example.crazydrive;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -60,6 +61,7 @@ public class GameActivity extends AppCompatActivity {
         config = ConfigManager.getInstance();
         config.setLanesCount(lanesCount);
         config.setLaneWidth(getLaneWidth());
+
         config.setRoadLength(getRoadLength());
         Log.i("Road length", "" + config.getRoadLength());
         config.setInitialLife(initialLives);
@@ -69,6 +71,7 @@ public class GameActivity extends AppCompatActivity {
         rl.setOnTouchListener(mc);
 
         gm = GameManager.getInstance();
+        gm.resetGame();
         gameLoop();
 
     }
@@ -97,7 +100,7 @@ public class GameActivity extends AppCompatActivity {
                 Intent myIntent = new Intent(GameActivity.this, GameOverActivity.class);
                 myIntent.putExtra("score", (int) gm.getScore());
                 GameActivity.this.startActivity(myIntent);
-                gm.resetGame();
+
                 finish();
             }
         }
@@ -117,8 +120,16 @@ public class GameActivity extends AppCompatActivity {
     public int getRoadLength(){
         Display display = getWindowManager().getDefaultDisplay();// find screen size X , Y
         Point size = new Point();
-        display.getRealSize(size);
-        return size.y;
+        display.getSize(size);
+        Resources resources = this.getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        int navBarSize = 0;
+        if (resourceId > 0) {
+            navBarSize  = resources.getDimensionPixelSize(resourceId);
+        }
+
+
+        return size.y + navBarSize;
     }
 
     public void renderGame(){
