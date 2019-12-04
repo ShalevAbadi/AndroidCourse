@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,18 +18,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 
 public class GameActivity extends AppCompatActivity {
+
+    private boolean isRunning = true;
+    private ConfigManager config;
+    private RelativeLayout rl;
+    private int lanesCount = 3;
+    private int initialLives = 3;
+    private int initialSpeed = 10;
+    private GameManager gm;
+    private Handler handler = new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        final RelativeLayout rl = new RelativeLayout(getApplicationContext());
+        rl = new RelativeLayout(getApplicationContext());
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.MATCH_PARENT
         );
         rl.setLayoutParams(lp);
         setContentView(rl);
-        runGame(rl);
+        runGame();
     }
 
     @Override
@@ -45,56 +56,62 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void runGame(final RelativeLayout rl){
-
-        ConfigManager conf = ConfigManager.getInstance();
-        int lanesCount = 3;
-        int initialLives = 3;
-        int initialSpeed = 5;
-        conf.setLanesCount(lanesCount);
-        conf.setLaneWidth(getLaneWidth(lanesCount));
-        conf.setRoadLength(getRoadLength());
-        conf.setInitialLife(initialLives);
-        conf.setSpeedController(new SpeedController(initialSpeed));
-        MoveController mc = new MoveController(conf.getLanesCount(), conf.getLanesCount()/2);
-        conf.setMoveController(mc);
+    public void runGame(){
+        config = ConfigManager.getInstance();
+        config.setLanesCount(lanesCount);
+        config.setLaneWidth(getLaneWidth());
+        config.setRoadLength(getRoadLength());
+        Log.i("Road length", "" + config.getRoadLength());
+        config.setInitialLife(initialLives);
+        config.setSpeedController(new SpeedController(initialSpeed));
+        MoveController mc = new MoveController(config.getLanesCount(), config.getLanesCount()/2);
+        config.setMoveController(mc);
         rl.setOnTouchListener(mc);
-        conf.setSpeedController(new SpeedController(10));
-        GameManager.resetGame();
-        final Handler handler = new Handler();
 
-        final Runnable runnable = new Runnable() {
-            public void run() {
-                // need to do tasks on the UI thread
-                rl.removeAllViewsInLayout();
-                renderGame(rl);
-                GameManager gm = GameManager.getInstance();
-                gm.doStep();
-                renderLifeBar(rl, gm.getLives());
-                if(gm.getScore() > ConfigManager.getInstance().getSpeedController().getSpeed()) {
-                    ConfigManager.getInstance().getSpeedController().setSpeed((int)gm.getScore());
-                }
-                if(gm.getLives() > 0){
-                    handler.postDelayed(this, 10);
-                } else{
-                    Intent myIntent = new Intent(GameActivity.this, GameOverActivity.class);
-                    myIntent.putExtra("score", (int)gm.getScore());
-                    GameActivity.this.startActivity(myIntent);
-                    finish();
-                }
-            }
-        };
-
-        handler.post(runnable);
+        gm = GameManager.getInstance();
+        gameLoop();
 
     }
 
-    public int getLaneWidth(int lanes){
+    private void gameLoop() {
+        Runnable runnable = new Runnable() {
+            public void run() {
+                // need to do tasks on the UI thread
+                rl.removeAllViewsInLayout();
+                gm.doStep();
+                renderGame();
+                renderLifeBar();
+                if (gm.getScore() > ConfigManager.getInstance().getSpeedController().getSpeed()) {
+                    ConfigManager.getInstance().getSpeedController().setSpeed((int) gm.getScore());
+                }
+
+                if(gm.getLives()>0)
+
+            {
+                if (isRunning) {
+                    handler.postDelayed(this, 10);
+                }
+            } else
+
+            {
+                Intent myIntent = new Intent(GameActivity.this, GameOverActivity.class);
+                myIntent.putExtra("score", (int) gm.getScore());
+                GameActivity.this.startActivity(myIntent);
+                gm.resetGame();
+                finish();
+            }
+        }
+        };
+        handler.post(runnable);
+    }
+
+
+    public int getLaneWidth(){
         Display display = getWindowManager().getDefaultDisplay();// find screen size X , Y
         Point size = new Point();
         display.getSize(size);
         int sizeX = size.x;
-        return sizeX / lanes;
+        return sizeX / config.getLanesCount();
     }
 
     public int getRoadLength(){
@@ -104,65 +121,82 @@ public class GameActivity extends AppCompatActivity {
         return size.y;
     }
 
-    public void renderGame(RelativeLayout rl){
-        GameManager gm = GameManager.getInstance();
-        ConfigManager config = ConfigManager.getInstance();
-        renderPlayerCar(rl, gm.getPlayerCar(), config.getLaneWidth(), config.getRoadLength());
-        renderRoad(rl, gm.getRoad());
+    public void renderGame(){
+        renderPlayerCar();
+        renderRoad();
     }
 
-    public void renderPlayerCar(RelativeLayout rl, PlayerCar playerCar, int laneWidth, int roadLength){
+    public void renderPlayerCar(){
         ImageView imageView_playerCar = new ImageView(this);
         imageView_playerCar.setImageResource(R.drawable.player_car);
-        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(playerCar.getWidth(), playerCar.getHeight() );
+        PlayerCar playerCar = gm.getPlayerCar();
+        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(playerCar.getWidth(), playerCar.getHeight());
         imageView_playerCar.setLayoutParams(lp);
-        lp.width = laneWidth;
-        imageView_playerCar.setX((laneWidth) * playerCar.getLane());
-        imageView_playerCar.setY(roadLength - playerCar.getHeight());
+        lp.width = config.getLaneWidth();
+        imageView_playerCar.setX((config.getLaneWidth()) * playerCar.getLane());
+        imageView_playerCar.setY(config.getRoadLength() - playerCar.getHeight());
         rl.addView(imageView_playerCar);
     }
 
-    public void renderLifeBar(RelativeLayout rl, int livesCount){
+    public void renderLifeBar(){
+        int heartMargin = 10;
+        int heartWidth = 70;
+        int heartHeight = 70;
         LinearLayout parent = new LinearLayout(this);
         parent.setX(0);
         parent.setY(0);
-        for( int i = 0; i < livesCount; i++) {
+        for( int i = 0; i < gm.getLives(); i++) {
             ImageView imageView_heart = new ImageView(this);
             imageView_heart.setImageResource(R.drawable.heart);
-            ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(70, 70);
+            ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(heartWidth, heartHeight);
             imageView_heart.setLayoutParams(lp);
             parent.addView(imageView_heart);
         }
         parent.setOrientation(LinearLayout.HORIZONTAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(10,10,10,0);
+        params.setMargins(heartMargin,heartMargin,heartMargin,heartMargin);
         parent.setLayoutParams(params);
         rl.addView(parent);
     }
 
-    public void renderRoad(RelativeLayout rl, Road road){
+    public void renderRoad(){
+        Road road = gm.getRoad();
         rl.setBackgroundResource(R.drawable.road_background);
         for(int i = 0; i < ConfigManager.getInstance().getLanesCount(); i++){
-            renderLane(rl, road.getQueue(i), ConfigManager.getInstance().getLaneWidth(), i);
+            renderLane(road.getQueue(i), i);
         }
     }
 
-    public void renderLane(RelativeLayout rl, ArrayList<RoadItem> itemsInLane, int laneWidth, int laneNumber){
+    public void renderLane(ArrayList<RoadItem> itemsInLane, int laneNumber){
         for( RoadItem item :itemsInLane){
-            renderPoliceCar(rl, item, laneWidth, laneNumber);
+            renderPoliceCar(item, laneNumber);
         }
     }
 
-    public void renderPoliceCar(RelativeLayout rl, RoadItem policeCar,int laneWidth, int lane){
+    public void renderPoliceCar(RoadItem policeCar,int lane){
         ImageView imageView_policeCar = new ImageView(this);
         imageView_policeCar.setImageResource(R.drawable.police_car);
         ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(policeCar.getWidth(), policeCar.getHeight() );
         imageView_policeCar.setLayoutParams(lp);
-        lp.width = laneWidth;
-        imageView_policeCar.setX((laneWidth) * lane);
+        lp.width = config.getLaneWidth();
+        imageView_policeCar.setX((config.getLaneWidth()) * lane);
         imageView_policeCar.setY(policeCar.getYPos());
         rl.addView(imageView_policeCar);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isRunning = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!isRunning){
+            isRunning = true;
+            gameLoop();
+        }
+    }
 
 }

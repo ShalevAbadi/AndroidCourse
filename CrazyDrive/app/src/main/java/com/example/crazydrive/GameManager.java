@@ -23,7 +23,7 @@ public class GameManager {
     }
 
     public static void resetGame(){
-        instance = new GameManager();
+        instance = null;
     }
 
     public void doStep(){
