@@ -1,19 +1,42 @@
 package com.example.crazydrive;
 
-public abstract class RoadItem implements RoadItemsTypes {
+import java.util.Random;
 
-    private Type type;
+public class RoadItem {
+    enum Types {
+        POLICE_CAR(2),
+        MONEY(1);
+
+        private int ratio;
+
+
+        Types(int ratio) {
+            this.ratio = ratio;
+        }
+
+        public int getRatio() {
+            return ratio;
+        }
+
+        public static Types getRandomType() {
+            Random random = new Random();
+            return values()[random.nextInt(values().length)];
+        }
+
+    }
+    private Types type;
     private int yPos;
     private int width;
     private int height;
 
-    public RoadItem(int yPos, int width, int height) {
+    public RoadItem(int yPos, int width, Types type) {
         this.yPos = yPos;
+        this.type = type;
         this.width = width;
-        this.height = height;
+        this.height = width*type.getRatio();
     }
 
-    public void setType(Type type) {
+    public void setType(Types type) {
         this.type = type;
     }
 
@@ -29,7 +52,7 @@ public abstract class RoadItem implements RoadItemsTypes {
         this.height = height;
     }
 
-    public Type getType() {
+    public Types getType() {
         return type;
     }
 

@@ -4,15 +4,12 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class MoveController implements IMoveController, View.OnTouchListener {
+public class MoveControllerOnTouch extends GeneralMoveController implements View.OnTouchListener {
 
-    private int numOfLanes;
-    private int lane;
-
-    public MoveController(int numOfLanes, int initialLane){
-        this.numOfLanes = numOfLanes;
-        this.lane = initialLane;
+    public MoveControllerOnTouch(int numOfLanes, int initialLane){
+        super(numOfLanes, initialLane);
     }
+
 
     public void moveRight(){
         if(this.lane < numOfLanes-1){
@@ -26,9 +23,6 @@ public class MoveController implements IMoveController, View.OnTouchListener {
         }
     }
 
-    public int getLane(){
-        return this.lane;
-    }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {

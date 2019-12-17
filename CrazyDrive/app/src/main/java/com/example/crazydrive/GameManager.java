@@ -7,8 +7,10 @@ public class GameManager {
     private int lives = conf.getInitialLivesCount();
     private PlayerCar playerCar;
     private Road road;
-    private double score = 0;
+    private long score = 0;
     private SpeedController speedController = conf.getSpeedController();
+    private int increaseSpeedDelta = 100;
+    private int stepsToIncreaseSpeed = increaseSpeedDelta;
 
     private GameManager(){
         this.playerCar = new PlayerCar(conf.getMoveController(), speedController, conf.getLaneWidth(), conf.getLaneWidth()/2);
@@ -27,7 +29,8 @@ public class GameManager {
     }
 
     public void doStep(){
-        score += 0.01;
+        score += 1;
+        increaseSpeed();
         road.moveAllRoadItems(playerCar.getSpeed());
         road.addRoadItems(playerCar);
         if(isCollision()){
@@ -36,8 +39,21 @@ public class GameManager {
     }
 
     private void handleCollision(){
+        RoadItem item = road.getFirstRoadItemAt(playerCar.getLane());
         road.removeFirstRoadItemAt(playerCar.getLane());
-        lives -=1;
+        if(item.getType() == RoadItem.Types.POLICE_CAR) {
+            lives--;
+        } if(item.getType() == RoadItem.Types.MONEY){
+            score+=5;
+        }
+    }
+
+    private void increaseSpeed(){
+        stepsToIncreaseSpeed -=1;
+        if(stepsToIncreaseSpeed == 0){
+            speedController.setSpeed(speedController.getSpeed()+1);
+            stepsToIncreaseSpeed = increaseSpeedDelta;
+        }
     }
 
     private boolean isCollision(){
@@ -57,7 +73,7 @@ public class GameManager {
         return lives;
     }
 
-    public double getScore(){
+    public long getScore(){
         return score;
     }
 

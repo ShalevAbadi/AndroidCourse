@@ -12,19 +12,21 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class GameOverActivity extends AppCompatActivity {
+    public static final String SCORE_KEY  = "SCORE";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        String backgroundColor = "#000000";
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         super.onCreate(savedInstanceState);
         Bundle b = getIntent().getExtras();
-        int score = b.getInt("score");
+        int score = b.getInt(SCORE_KEY);
         final RelativeLayout rl = new RelativeLayout(getApplicationContext());
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.MATCH_PARENT
         );
         rl.setLayoutParams(lp);
-        rl.setBackgroundColor(Color.parseColor("#000000"));
+        rl.setBackgroundColor(Color.parseColor(backgroundColor));
         setContentView(rl);
         renderGameOverScreen(rl, score);
 
@@ -44,26 +46,29 @@ public class GameOverActivity extends AppCompatActivity {
         }
     }
 
-    public void renderGameOverScreen(RelativeLayout rl , int score){
+    public void renderGameOverScreen(RelativeLayout rl , long score){
+        String scoreStr = "" + score;
+        String yourScoreStr = "Your Score:";
+        String mainMenuStr = "Main Menu";
+        int scoreId = 1;
         RelativeLayout.LayoutParams msgLp = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         RelativeLayout.LayoutParams scoreLp = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         RelativeLayout.LayoutParams btnLp = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         TextView msg = new TextView(this);
-        msg.setText("Your Score:");
+        msg.setText(yourScoreStr);
         msg.setTextSize(TypedValue.COMPLEX_UNIT_SP,30);
-        msg.setId((int)1);
         msg.setLayoutParams(msgLp);
         msg.setBackgroundColor(Color.TRANSPARENT);
         msg.setTextColor(Color.RED);
         TextView scoreView = new TextView(this);
-        scoreView.setText("" + score);
+        scoreView.setText(scoreStr);
         scoreView.setBackgroundColor(Color.TRANSPARENT);
-        scoreView.setId((int)2);
+        scoreView.setId(scoreId);
         scoreView.setLayoutParams(scoreLp);
         scoreView.setTextSize(TypedValue.COMPLEX_UNIT_SP,30);
         scoreView.setTextColor(Color.RED);
         Button btnTag = new Button(this);
-        btnTag.setText("Main Menu");
+        btnTag.setText(mainMenuStr);
         btnTag.setTextSize(TypedValue.COMPLEX_UNIT_SP,30);
         btnTag.setBackgroundColor(Color.TRANSPARENT);
         btnTag.setLayoutParams(btnLp);
