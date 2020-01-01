@@ -1,5 +1,6 @@
 package com.example.crazydrive;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -36,16 +37,18 @@ public class GameActivity extends AppCompatActivity {
             return difficulty;
         }
     }
-    private int diff;
+    private int diff = Difficulty.EASY.getDifficulty();
     private boolean isRunning = true;
     private ConfigManager config;
     private RelativeLayout rl;
     private int lanesCount = 5;
     private int initialLives = 3;
     private int initialSpeed = 5;
+    private String scoreStringEnd = "$";
     private GameManager gm;
     private Handler handler = new Handler();
     private  Map<RoadItem.Types, Integer> dictionaryRoadItemsTypeToDrawable = new HashMap<>();
+    private Context con;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +56,10 @@ public class GameActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         rl = new RelativeLayout(getApplicationContext());
         Bundle b = getIntent().getExtras();
-        diff = b.getInt(DIFFICULTY_KEY);
+        con = this;
+        if(b != null) {
+            diff = b.getInt(DIFFICULTY_KEY, Difficulty.EASY.getDifficulty());
+        }
         initRoadItemsDrawablesMap();
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
@@ -103,7 +109,7 @@ public class GameActivity extends AppCompatActivity {
     private void runGame(){
         setGameConfiguration();
         gm = GameManager.getInstance();
-        gm.resetGame();
+        GameManager.resetGame();
         gameLoop();
 
     }
@@ -125,10 +131,17 @@ public class GameActivity extends AppCompatActivity {
             } else
 
             {
-                Intent gameOverIntent = new Intent(GameActivity.this, GameOverActivity.class);
-                gameOverIntent.putExtra(GameOverActivity.SCORE_KEY, (int) gm.getScore());
-                GameActivity.this.startActivity(gameOverIntent);
-
+                TopTenDBHandler topTenDBHandler = new TopTenDBHandler(con);
+                topTenDBHandler.updateRecordsFromDB();
+                if(topTenDBHandler.isTopTen(new TopTenRecord(gm.getScore()))){
+                  Intent gameOverIntent = new Intent(GameActivity.this, NewTopTenActivity.class);
+                    gameOverIntent.putExtra(GameOverActivity.SCORE_KEY, gm.getScore());
+                    GameActivity.this.startActivity(gameOverIntent);
+                } else {
+                    Intent gameOverIntent = new Intent(GameActivity.this, GameOverActivity.class);
+                    gameOverIntent.putExtra(GameOverActivity.SCORE_KEY, gm.getScore());
+                    GameActivity.this.startActivity(gameOverIntent);
+                }
                 finish();
             }
         }
@@ -201,7 +214,8 @@ public class GameActivity extends AppCompatActivity {
     private void renderScore(){
         RelativeLayout.LayoutParams scoreLp = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         TextView scoreView = new TextView(this);
-        scoreView.setText((int)gm.getScore() + "$");
+        String scoreStr = (int)gm.getScore() + scoreStringEnd;
+        scoreView.setText(scoreStr);
         scoreView.setBackgroundColor(Color.TRANSPARENT);
         scoreView.setLayoutParams(scoreLp);
         scoreView.setTextSize(TypedValue.COMPLEX_UNIT_SP,30);
@@ -225,14 +239,14 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void initRoadItemsDrawablesMap(){
-        dictionaryRoadItemsTypeToDrawable.put(RoadItem.Types.POLICE_CAR, Integer.valueOf(R.drawable.police_car));
-        dictionaryRoadItemsTypeToDrawable.put(RoadItem.Types.MONEY, Integer.valueOf(R.drawable.dollar_sign));
+        dictionaryRoadItemsTypeToDrawable.put(RoadItem.Types.POLICE_CAR, R.drawable.police_car);
+        dictionaryRoadItemsTypeToDrawable.put(RoadItem.Types.MONEY, R.drawable.dollar_sign);
     }
 
     public void renderRoadItem(RoadItem roadItem, int lane){
         ImageView imageView_policeCar = new ImageView(this);
-        Integer temp = dictionaryRoadItemsTypeToDrawable.get(roadItem.getType());
-        imageView_policeCar.setImageResource(temp.intValue());
+        int temp = dictionaryRoadItemsTypeToDrawable.get(roadItem.getType());
+        imageView_policeCar.setImageResource(temp);
         ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(roadItem.getWidth(), roadItem.getHeight() );
         imageView_policeCar.setLayoutParams(lp);
         lp.width = config.getLaneWidth();

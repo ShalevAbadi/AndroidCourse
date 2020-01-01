@@ -111,14 +111,12 @@ public class MainActivity extends AppCompatActivity {
         hardBtnTag.setAlpha((float)0.65);
         hardBtnTag.setBackgroundColor(Color.TRANSPARENT);
         lp.addRule(RelativeLayout.BELOW, centerViewId);
-        //add button to the layout
         rl.addView(hardBtnTag);
 
         hardBtnTag.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent myIntent = new Intent(MainActivity.this, GameActivity.class);
-                myIntent.putExtra(GameActivity.DIFFICULTY_KEY, GameActivity.Difficulty.HARD.getDifficulty());
+                Intent myIntent = new Intent(MainActivity.this, TopTenActivity.class);
                 MainActivity.this.startActivity(myIntent);
             }
         });

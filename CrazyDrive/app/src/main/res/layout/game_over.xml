@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/game_over_msg"
+            android:layout_marginTop="50dp"
+            android:text="Game Over"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@id/game_over_score_msg"
+            android:textSize="32sp"
+            android:textColor="#ff0000"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/game_over_score_msg"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:textSize="20sp"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/game_over_main_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:text="Main Menu"
+            android:layout_centerHorizontal="true"
+            android:textSize="32sp"
+            android:layout_below="@+id/game_over_score_msg"/>
+
+</RelativeLayout>

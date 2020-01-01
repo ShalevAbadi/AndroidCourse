@@ -1,24 +1,57 @@
 package com.example.crazydrive;
 
-public class TopTenRecord {
-    private double latitude;
-    private double longitude;
-    private long time;
+import androidx.annotation.NonNull;
+
+public class TopTenRecord{
+    private String name = "unknown";
     private long score;
-    public double getLatitude() {
-        return latitude;
+
+    public void setLat(double lat) {
+        this.lat = lat;
     }
 
-    public double getLongitude() {
-        return longitude;
+    public void setLng(double lng) {
+        this.lng = lng;
     }
 
-    public long getTime() {
-        return time;
+    private double lat;
+    private double lng;
+    public double getLat() {
+        return lat;
+    }
+
+    public double getLng() {
+        return lng;
+    }
+
+
+
+    public TopTenRecord(long score){
+        this.score = score;
+    }
+
+    public void setName(String name) {
+        if(!name.isEmpty()) {
+            this.name = name;
+        }
+    }
+
+    public void setScore(long score) {
+        this.score = score;
+    }
+
+
+    public String getName() {
+        return name;
     }
 
     public long getScore() {
         return score;
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return (getName() + " got " + getScore() + "$");
+    }
 }

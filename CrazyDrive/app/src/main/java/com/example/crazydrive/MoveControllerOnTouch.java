@@ -1,6 +1,5 @@
 package com.example.crazydrive;
 
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/new_record_msg"
+            android:layout_marginTop="50dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:textSize="32sp"
+            android:textColor="#757575" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/enter_name_msg"
+            android:text="Enter Your Name"
+            android:layout_marginTop="50dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/new_record_msg"
+            android:textSize="32sp"
+            android:textColor="#757575" />
+
+        <EditText
+            android:id="@+id/name_input"
+            android:layout_width="300dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:textSize="32sp"
+            android:layout_below="@id/enter_name_msg"></EditText>
+
+        <Button
+            android:id="@+id/new_top_ten_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:text="Save"
+            android:layout_centerHorizontal="true"
+            android:textSize="32sp"
+            android:layout_below="@+id/name_input"/>
+
+</RelativeLayout>
