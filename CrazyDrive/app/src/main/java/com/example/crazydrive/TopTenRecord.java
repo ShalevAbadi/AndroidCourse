@@ -5,7 +5,9 @@ import androidx.annotation.NonNull;
 public class TopTenRecord{
     private String name = "unknown";
     private long score;
-
+    private double lat = 0;
+    private double lng = 0;
+            ;
     public void setLat(double lat) {
         this.lat = lat;
     }
@@ -14,8 +16,6 @@ public class TopTenRecord{
         this.lng = lng;
     }
 
-    private double lat;
-    private double lng;
     public double getLat() {
         return lat;
     }
@@ -23,7 +23,6 @@ public class TopTenRecord{
     public double getLng() {
         return lng;
     }
-
 
 
     public TopTenRecord(long score){
